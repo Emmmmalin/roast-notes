@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap">
+<title>烘豆秘笈</title>
+<meta name="description" content="咖啡烘焙數據紀錄:烘焙數據、客戶資料、日期查詢">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cellipse cx='16' cy='16' rx='10' ry='13' fill='%238f5a2c' stroke='%234a3626' stroke-width='2' transform='rotate(-8 16 16)'/%3E%3Cpath d='M15 5C20 12 12 20 17 27' fill='none' stroke='%23d2a56b' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eceef0;--fg:#23223a;--card:#fff;--ink:#3d3a7a;--bd:#dfdfe9;--head:#e7e5f6;--headfg:#3d3a7a;--mut:#6e6d86;--calc:#f4f3fa;--inp:#c8c8d8;--lnk:#5b4bd6;--hl:#ff7a1a;--onfg:#1f1e33;--btn:#5b4bd6;--btnfg:#fff;--num:#e0620d;--ok:#3aa876;--ttlbg:#3d3a7a;--ttlfg:#fff;--rowh:#fff3e6;--sh:rgba(35,34,58,.08)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1b26;--fg:#ececf5;--card:#272636;--ink:#a8a4e6;--bd:#3b3a50;--head:#33324a;--headfg:#e8e8f4;--mut:#a4a3bd;--calc:#2d2c40;--inp:#52506e;--lnk:#a5a0ff;--btn:#8b7dff;--btnfg:#14122b;--num:#ff9a4d;--ttlbg:#3d3a7a;--ttlfg:#fff;--rowh:#3a3128;--sh:rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#1c1b26;--fg:#ececf5;--card:#272636;--ink:#a8a4e6;--bd:#3b3a50;--head:#33324a;--headfg:#e8e8f4;--mut:#a4a3bd;--calc:#2d2c40;--inp:#52506e;--lnk:#a5a0ff;--btn:#8b7dff;--btnfg:#14122b;--num:#ff9a4d;--ttlbg:#3d3a7a;--ttlfg:#fff;--rowh:#3a3128;--sh:rgba(0,0,0,.4)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+body{margin:0;font:17px/1.5 "Huninn","Noto Sans TC",system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+button{font-family:inherit;color:inherit}
+[hidden]{display:none!important}
+header{padding:26px 20px 4px;display:flex;justify-content:center}
+.hd{width:min(1200px,100%);display:flex;gap:16px;flex-wrap:wrap;align-items:stretch}
+.hd-main{flex:1 1 520px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ttl{display:flex;align-items:center;justify-content:center;padding:14px 18px 12px;background:var(--ttlbg);color:var(--ttlfg);border-radius:16px;border-bottom:6px solid var(--hl)}
+.ttl h1{margin:0;font-weight:normal;font-size:clamp(40px,7.5vw,68px);line-height:1.15;letter-spacing:.2em;text-indent:.2em;white-space:nowrap}
+nav{display:flex;gap:10px}
+nav button{flex:1;font-size:20px;padding:11px 6px;background:var(--card);color:var(--fg);border:2px solid var(--ink);border-radius:12px;cursor:pointer;white-space:nowrap}
+nav button:hover{background:var(--calc)}
+nav button.on{background:var(--hl);border-color:var(--ink);color:var(--onfg)}
+.hd-side{flex:0 1 240px;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.roast{flex:1;display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 16px;background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:0 1px 3px var(--sh)}
+.bean{display:block;width:76px;height:92px;flex:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.bean .b{fill:var(--bean);transition:fill .6s}
+.rlab{font-size:19px;line-height:1.4;color:var(--fg)}
+.tools{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 12px;font-size:14px}
+.tools a{margin:0;color:var(--mut);text-decoration:underline;cursor:pointer}
+#bk{align-self:center;background:none;border:0;color:var(--mut);font-size:14px;text-decoration:underline;cursor:pointer;padding:2px 6px}
+#warn{background:#fde8d8;color:#6b2d0a;padding:8px 16px;text-align:center}
+main{padding:22px 20px 40px;max-width:1200px;margin:auto}
+form{background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:0 1px 3px var(--sh);padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:18px}
+label{font-size:15px;color:var(--mut);display:flex;flex-direction:column;gap:4px}label.w{grid-column:1/-1}
+input,textarea,select{padding:9px 10px;border:1px solid var(--inp);border-radius:10px;font:inherit;font-size:16px;background:var(--bg);color:var(--fg)}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--hl);outline-offset:1px}
+.btn{padding:10px 22px;font-size:17px;border:0;border-radius:10px;background:var(--btn);color:var(--btnfg);cursor:pointer;align-self:end}
+.btn:hover{background:var(--hl);color:#111}
+.btn.g{background:transparent;color:var(--fg);border:1px solid var(--inp)}
+.btn.g:hover{background:var(--calc);color:var(--fg)}
+.btn:active{transform:translateY(1px)}
+.box{overflow-x:auto;background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:0 1px 3px var(--sh)}
+table{border-collapse:collapse;width:100%}
+th,td{padding:10px 14px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+th{background:var(--head);color:var(--headfg);font-size:15px;font-weight:normal;border-bottom:2px solid var(--inp)}
+td.c{background:var(--calc)}td.t{white-space:pre-line;min-width:180px;max-width:300px}
+tr:hover td{background:var(--rowh)}
+a{color:var(--lnk);cursor:pointer;margin-right:12px;text-decoration:none}
+a:hover{text-decoration:underline}
+h3{margin:16px 0 8px}
+.k{display:inline-block;background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--hl);border-radius:12px;box-shadow:0 1px 3px var(--sh);padding:8px 16px;margin:0 10px 10px 0;font-size:15px}
+.k b{font-size:1.5em;color:var(--num);font-weight:normal}
+#mng{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center}
+.mbg{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.mbox{position:relative;background:var(--card);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.3);padding:18px;width:min(420px,92vw);max-height:80vh;overflow:auto}
+.mbox h3{margin:0 0 10px;font-weight:normal;font-size:1.15em}
+.mi{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--bd)}
+.mi a{margin:0;white-space:nowrap}
+#cfm{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center}
+.cbox{position:relative;background:var(--card);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.3);padding:20px;width:min(380px,90vw);text-align:center}
+.cbox p{margin:0 0 16px;white-space:pre-line}
+.cbox .btn{margin:0 6px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ttlbg);color:var(--ttlfg);padding:10px 18px;border-radius:12px;z-index:400;max-width:90vw;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+@media (min-width:1000px){
+main{display:grid;grid-template-columns:minmax(330px,410px) minmax(0,1fr);gap:24px;align-items:start;max-width:1600px}
+#form{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;padding:0 10px 10px 0}
+#form form{margin-bottom:0;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:700px){nav button{font-size:17px}.hd-side{flex:1 1 100%}.roast{padding:8px 12px}}
+</style></head><body>
+<header>
+<div class="hd"><div class="hd-main"><div class="ttl"><h1>烘豆秘笈</h1></div><nav id="nav"></nav></div>
+<div class="hd-side"><span id="roast" class="roast" style="--bean:#8f5a2c;--face:#fff4d6"><svg class="bean" viewBox="0 0 60 72" aria-hidden="true"><ellipse class="b" cx="30" cy="37" rx="22" ry="29" transform="rotate(-8 30 37)" stroke="#4a3626" stroke-width="3"/><path d="M27 11C37 24 23 49 33 63" fill="none" style="stroke:var(--face)" stroke-opacity=".55" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="19" cy="24" rx="4.5" ry="9" fill="#fff" opacity=".3" transform="rotate(22 19 24)"/></svg><span id="rlab" class="rlab">粉色值</span></span><div class="tools"><a onclick="backup()">下載備份</a><a onclick="pickFile('json')">還原備份</a><a onclick="exportCsv()">匯出 CSV</a><a onclick="pickFile('csv')">匯入 CSV</a></div><input type="file" id="imp" hidden onchange="onFile(this)"></div></div>
+</header>
+<div id="warn" hidden></div>
+<div id="mng" hidden></div>
+<div id="cfm" hidden></div>
+<div id="toast" hidden></div>
+<main><div id="form"></div><div id="list"></div></main>
+<script>
+const S={
+batches:{name:"烘焙數據",f:[["date","烘焙日期","d"],["customer","客戶名稱","p"],["charge_g","投豆量(kg)","n"],["bean","品項","t"],["process","處理法","p"],["origin","產地","p"],["drop_t","下豆時間","m"],["drop_temp","下豆溫(°C)","n"],["ground_color","粉色值","n"],["ops","火力/風門/轉速調整","a"],["notes","備註","a"]]},
+customers:{name:"客戶資料",f:[["name","客戶名稱","t"],["contact","聯絡人","t"],["phone","電話","t"],["address","地址","t"],["notes","備註","a"]]},
+opts:{name:"選項",f:[]}};
+const SHOW={batches:["date","customer","charge_g","bean","process","origin","drop_t","drop_temp","ground_color","ops","notes"]};
+let D={batches:[],customers:[],opts:[]},qFrom="",qTo="",qCust="",tab="batches",ed=null,db=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sec=v=>{const m=/^(\d+):(\d{1,2})$/.exec(String(v||"").trim());return m?+m[1]*60+ +m[2]:null};
+const mmss=s=>s==null?"":Math.floor(s/60)+":"+String(Math.round(s%60)).padStart(2,"0");
+const pct=v=>v==null||isNaN(v)?"":(v*100).toFixed(1)+"%";
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+const DEF=["多那之","壹咖啡","KafeD","沐泓","永希","王璽","友誠","石董","雅聞","小曹","鮮一杯","阿努納奇"];
+const custOpts0=()=>[...new Set([...DEF,...D.customers.map(c=>c.name),...D.batches.map(b=>b.customer)])].filter(n=>n&&n!="其他");
+const DEFO={process:["水洗","日曬","蜜處理","厭氧"],origin:["衣索比亞","哥倫比亞","巴西","瓜地馬拉","哥斯大黎加","印尼","越南","肯亞","盧安達","祕魯","巴拿馬","台灣"]};
+const hasOpts=k=>D.opts.some(x=>x.id==k&&Array.isArray(x.items));
+const optList=k=>{const s=D.opts.find(x=>x.id==k);return s&&Array.isArray(s.items)?s.items:(k=="customer"?custOpts0():DEFO[k])};
+const custOpts=()=>optList("customer");
+const X={batches:[]};
+
+const KEY="roast-data-v1";
+const nid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(D));return true}catch(e){say("此瀏覽器無法儲存資料(可能是無痕模式),請先用「下載備份」保存。");return false}}
+function loadLocal(){try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j)for(const t in S)if(Array.isArray(j[t]))D[t]=j[t]}catch(e){}
+ for(const t in S)D[t].sort((a,b)=>(b._ts||0)-(a._ts||0))}
+async function put(t,id,d){const i=D[t].findIndex(x=>x.id==id),r={id:id||nid(),...d};if(i<0)D[t].unshift(r);else D[t][i]=r;saveLocal();renderList()}
+async function rm(t,id){D[t]=D[t].filter(x=>x.id!=id);saveLocal();renderList()}
+
+const latestGC=()=>{const b=D.batches.find(x=>x.ground_color!=null);return b?b.ground_color:""};
+function setBean(v){const n=parseFloat(v),e=$("roast");if(!e)return;
+ const t=isNaN(n)?["#8f5a2c",""]:n>=90?["#f3e5b0","極淺焙"]:n>=80?["#d2a56b","淺焙"]:n>=75?["#b8814a","淺中焙"]:n>=70?["#8f5a2c","中焙"]:n>=60?["#6b3e1e","中深焙"]:n>=50?["#4a2a14","深焙"]:["#2a1608","極深焙"];
+ e.style.setProperty("--bean",t[0]);e.style.setProperty("--face",isNaN(n)||n<75?"#fff4d6":"#6b4a2e");$("rlab").innerHTML=isNaN(n)?"粉色值":`粉色值 ${n}<br>${t[1]}`}
+let cSel="";
+function cForm(){return`<form onsubmit="return false"><label>客戶<select id="c_sel" onchange="cSel=this.value;renderList()"><option value="">請選擇客戶</option>${custOpts().map(n=>`<option${n==cSel?" selected":""}>${esc(n)}</option>`).join("")}</select><a onclick="mngOpts('customer')">⚙ 管理選項</a></label></form>`}
+function pickC(n){cSel=n;render()}
+function cView(){
+ const cnt={};D.batches.forEach(b=>{if(b.customer)cnt[b.customer]=(cnt[b.customer]||0)+1});
+ const chips=Object.keys(cnt).sort().map(n=>`<a data-n="${esc(n)}" onclick="pickC(this.dataset.n)">${esc(n)}(${cnt[n]})</a>`).join(" ")||"尚無資料";
+ const dv=b=>b.date||"",rows=cSel?D.batches.filter(b=>b.customer==cSel).sort((a,b)=>dv(a)<dv(b)?1:dv(a)>dv(b)?-1:(b._ts||0)-(a._ts||0)):[];
+ return`<div style="margin-bottom:10px;color:var(--mut)">有烘焙紀錄的客戶(批數),點選可查看:<br>${chips}</div>`+(cSel?`<span class="k">${esc(cSel)}<br><b>${rows.length} 批</b></span>`+(rows.length?table("batches",rows,["date","bean","process","ground_color"]):'<div class="box"><table><tr><td>這位客戶還沒有烘焙紀錄</td></tr></table></div>'):"")}
+const OPT_LAB={process:"處理法",origin:"產地",customer:"客戶名稱"};
+let mngK="";
+function mngOpts(k){mngK=k;showMng();$("mng").hidden=false}
+function closeMng(){$("mng").hidden=true}
+function showMng(){
+ const o=optList(mngK);
+ $("mng").innerHTML=`<div class="mbg" onclick="closeMng()"></div><div class="mbox"><h3>管理「${OPT_LAB[mngK]}」選項</h3>${o.map((x,i)=>`<div class="mi"><span>${esc(x)}</span><a data-i="${i}" onclick="delOpt(+this.dataset.i)">✕ 刪除</a></div>`).join("")}<div class="mi" style="opacity:.6"><span>其他</span><span>固定保留</span></div><div style="display:flex;gap:8px;margin-top:12px"><input id="mng_new" placeholder="新增選項" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter'){event.preventDefault();addOpt()}"><button type="button" class="btn" onclick="addOpt()">新增</button></div><div style="margin-top:14px;text-align:right"><button type="button" class="btn g" onclick="closeMng()">完成</button>${hasOpts(mngK)?' <button type="button" class="btn g" onclick="resetOpts()">還原預設</button>':""}</div></div>`}
+function refreshSel(){
+ const o=optList(mngK),opt=(a,v)=>a.map(x=>`<option${x==v?" selected":""}>${esc(x)}</option>`).join("");
+ const s=$("f_"+mngK);
+ if(s&&s.tagName=="SELECT"){const v=s.value;s.innerHTML='<option value="">請選擇</option>'+opt([...o,"其他"],v);
+  if(v&&v!="其他"&&!o.includes(v)){s.hidden=true;$("box_"+mngK).hidden=false;$("f_"+mngK+"_txt").value=v}else s.value=v}
+ if(mngK=="customer")for(const [id,ph] of [["q_cust","全部客戶"],["c_sel","請選擇客戶"]]){const t=$(id);if(t){const v=t.value;t.innerHTML=`<option value="">${ph}</option>`+opt(o,v);t.value=v}}}
+async function setOpts(k,items){
+ const i=D.opts.findIndex(x=>x.id==k),old=i<0?null:D.opts[i];
+ if(i<0)D.opts.push({id:k,items});else D.opts[i]={...old,items};
+ try{await put("opts",k,{items,_ts:Date.now()})}catch(e){if(i<0)D.opts=D.opts.filter(x=>x.id!=k);else D.opts[i]=old;say("儲存失敗:"+(e.message||e.code))}
+ if(mngK==k&&!$("mng").hidden){showMng();refreshSel()}}
+async function delOpt(i){const o=[...optList(mngK)],x=o[i];if(x==null)return;
+ if(!await ask(`刪除選項「${x}」?\n已經用過這個選項的烘焙紀錄不會被改動。`))return;
+ o.splice(i,1);await setOpts(mngK,o)}
+async function addOpt(){const el=$("mng_new"),v=(el.value||"").trim(),o=optList(mngK);
+ if(!v||v=="其他"||o.includes(v)){el.value="";return}
+ await setOpts(mngK,[...o,v]);const n=$("mng_new");if(n){n.value="";n.focus()}}
+async function resetOpts(){if(!await ask("還原成預設選項?"))return;const k=mngK;
+ D.opts=D.opts.filter(x=>x.id!=k);try{await rm("opts",k)}catch(e){say("還原失敗:"+(e.message||e.code))}
+ showMng();refreshSel()}
+function ask(msg){return new Promise(res=>{const c=$("cfm");c.innerHTML=`<div class="mbg"></div><div class="cbox"><p>${esc(msg)}</p><button type="button" class="btn g" id="cfm_no">取消</button><button type="button" class="btn" id="cfm_ok">確定</button></div>`;c.hidden=false;const done=v=>{c.hidden=true;res(v)};$("cfm_ok").onclick=()=>done(true);$("cfm_no").onclick=()=>done(false)})}
+let _tt;function say(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(_tt);_tt=setTimeout(()=>{t.hidden=true},3500)}
+function fmtTime(el,fin){let d=el.value.replace(/\D/g,"").slice(0,4);
+ if(d.length>=3){let m=d.slice(0,-2),s=d.slice(-2);if(fin){m=String(+m);if(+s>59)s="59"}d=m+":"+s}
+ else if(fin&&d.length)d=String(+d)+":00";
+ el.value=d}
+function go(t){tab=t;ed=null;render()}
+function render(){
+ $("nav").innerHTML=["batches","customers","q"].map(t=>`<button class="${t==tab?"on":""}" onclick="go('${t}')">${t=="q"?"日期查詢":S[t].name}</button>`).join("");
+ $("form").innerHTML=tab=="q"?qForm():tab=="customers"?cForm():formHtml(tab);renderList()}
+function field(k,l,ty,r){
+ const v=r[k]??(ty=="d"?new Date().toISOString().slice(0,10):""),id="f_"+k;
+ if(ty=="p"){const o=[...optList(k),"其他"];const cm=v=="其他"||(v&&!o.includes(v));return`<label>${l}<select id="${id}" onchange="pickCust(this,'${k}')"${cm?" hidden":""}><option value="">請選擇</option>${o.map(x=>`<option${x==v?" selected":""}>${esc(x)}</option>`).join("")}</select><span id="box_${k}"${cm?"":" hidden"} style="display:flex;gap:8px;align-items:center"><input id="${id}_txt" type="text" placeholder="請輸入${l}" value="${esc(v=="其他"?(r[k+"_other"]||""):v)}" style="flex:1;min-width:0"><a onclick="backCust('${k}')">改選清單</a></span><a onclick="mngOpts('${k}')">⚙ 管理選項</a></label>`}
+ if(ty=="a")return`<label class="w">${l}<textarea id="${id}" rows="3">${esc(v)}</textarea></label>`;
+ const type=ty=="n"?'number" step="any':ty=="d"?"date":"text",ph=ty=="m"?' placeholder="輸入數字,例 1030" inputmode="numeric" maxlength="5" oninput="fmtTime(this)" onblur="fmtTime(this,1)"':"",ls=ty=="lot"||ty=="batch"?` list="dl_${ty}"`:"";
+ return`<label>${l}<input id="${id}" type="${type}" value="${esc(v)}"${ph}${ls}${k=="ground_color"?' oninput="setBean(this.value||latestGC())"':""}></label>`}
+function pickCust(s,k){if(s.value=="其他"){s.hidden=true;$("box_"+k).hidden=false;const i=$("f_"+k+"_txt");i.value="";i.focus()}}
+function backCust(k){const s=$("f_"+k);s.value="";s.hidden=false;$("box_"+k).hidden=true}
+function formHtml(t){
+ const r=ed&&ed.t==t?D[t].find(x=>x.id==ed.id)||{}:{};
+ return`<form onsubmit="save('${t}');return false">${S[t].f.map(([k,l,ty])=>field(k,l,ty,r)).join("")}<span><button class="btn">${ed?"儲存修改":"新增"}</button> ${ed?`<button type="button" class="btn g" onclick="go('${t}')">取消</button>`:""}</span></form>`}
+function renderList(){
+ const f=$("f_ground_color");setBean(f&&f.value!==""?f.value:latestGC());
+ $("list").innerHTML=tab=="q"?query():tab=="customers"?cView():table(tab)}
+function table(t,rs,cols){
+ const lab=Object.fromEntries(S[t].f.map(([k,l])=>[k,l])),sh=cols||SHOW[t];
+ const head=sh.map(k=>`<th>${lab[k].replace(/\(.*/,"")}</th>`).join("")+X[t].map(c=>`<th>${c[0]}</th>`).join("")+"<th></th>";
+ const rows=(rs||D[t]).map(x=>`<tr>${sh.map(k=>`<td${k=="ops"||k=="notes"?' class="t"':""}>${esc(k=="customer"&&x.customer=="其他"&&x.customer_other?"其他("+x.customer_other+")":x[k])}</td>`).join("")}${X[t].map(c=>`<td class="c">${c[1](x)}</td>`).join("")}<td><a onclick="edit('${t}','${x.id}')">編輯</a>${cols?"":`<a onclick="del('${t}','${x.id}')">刪除</a>`}</td></tr>`).join("");
+ return`<div class="box"><table><tr>${head}</tr>${rows||'<tr><td colspan="20">尚無資料</td></tr>'}</table></div>`}
+function qForm(){return`<form onsubmit="return false"><label>起始日期<input type="date" id="q_from" value="${esc(qFrom)}" oninput="qFrom=this.value;renderList()"></label><label>結束日期<input type="date" id="q_to" value="${esc(qTo)}" oninput="qTo=this.value;renderList()"></label><label>客戶<select id="q_cust" onchange="qCust=this.value;renderList()"><option value="">全部客戶</option>${custOpts().map(n=>`<option${n==qCust?" selected":""}>${esc(n)}</option>`).join("")}</select><a onclick="mngOpts('customer')">⚙ 管理選項</a></label><span><button type="button" class="btn g" onclick="qFrom=qTo=qCust='';render()">清除</button></span></form>`}
+function pick(d){qFrom=qTo=d;render()}
+function query(){
+ const k=(a,b)=>`<span class="k">${a}<br><b>${b}</b></span>`;
+ const all=D.batches.filter(b=>b.date),rows=all.filter(b=>(!qFrom||b.date>=qFrom)&&(!qTo||b.date<=qTo)&&(!qCust||b.customer==qCust)).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(b._ts||0)-(a._ts||0));
+ const cnt={};all.forEach(b=>cnt[b.date]=(cnt[b.date]||0)+1);
+ const chips=Object.keys(cnt).sort().reverse().map(d=>`<a onclick="pick('${d}')">${d}(${cnt[d]})</a>`).join(" ")||"尚無資料";
+ const kg=rows.reduce((s,b)=>s+(+b.charge_g||0),0),tp=rows.map(b=>b.drop_temp).filter(x=>x!=null),gc=rows.map(b=>b.ground_color).filter(x=>x!=null);
+ const f=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):"-";
+ return`<div style="margin-bottom:10px;color:var(--mut)">有烘焙紀錄的日期(批數),點選可查詢:<br>${chips}</div>`+k("符合批數",rows.length)+k("總投豆量(kg)",+kg.toFixed(2))+k("平均下豆溫(°C)",f(tp))+k("平均粉色值",f(gc))+(rows.length?table("batches",rows):'<div class="box"><table><tr><td>此日期範圍沒有烘焙紀錄</td></tr></table></div>')}
+function edit(t,id){tab=t;ed={t,id};render();scrollTo(0,0)}
+async function del(t,id){if(await ask("確定刪除?")){try{await rm(t,id)}catch(e){say("刪除失敗:"+(e.message||e.code))}}}
+async function save(t){
+ const d={};
+ for(const [k,,ty] of S[t].f){const v=$("f_"+k).value.trim();d[k]=v===""?null:ty=="n"?Number(v):v}
+ const rec=ed&&ed.t==t?D[t].find(x=>x.id==ed.id):null;
+ if(t=="lots"&&!d.code)return say("請填編號");
+ if(t=="lots"&&D[t].some(x=>x.code==d.code&&(!rec||x.id!=rec.id)))return say("編號重複");
+ if(t=="batches")for(const k of["customer","process","origin"]){const bx=$("box_"+k);if(bx&&!bx.hidden)d[k]=$("f_"+k+"_txt").value.trim()||"其他"}
+ if(t=="customers"){if(!d.name)return say("請填客戶名稱");if(D[t].some(x=>x.name==d.name&&(!rec||x.id!=rec.id)))return say("客戶名稱重複")}
+ if(t=="batches"&&d.customer&&d.customer!="其他"&&hasOpts("customer")&&!optList("customer").includes(d.customer))await setOpts("customer",[...optList("customer"),d.customer]);
+ d._ts=rec?._ts||Date.now();
+ try{await put(t,rec?rec.id:null,d);if(t=="customers"&&rec&&rec.name!=d.name)for(const b of D.batches.filter(b=>b.customer==rec.name)){const{id,...r}=b;await put("batches",id,{...r,customer:d.name})}ed=null;render()}catch(e){say("儲存失敗:"+(e.message||e.code))}}
+function dl(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const stamp=()=>new Date().toISOString().slice(0,10);
+function backup(){dl(`roast-backup-${stamp()}.json`,JSON.stringify(D,null,2),"application/json");say("已下載備份檔")}
+const csvCell=v=>{v=v==null?"":String(v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+function exportCsv(){const F=S.batches.f,rows=[F.map(f=>csvCell(f[1])).join(",")];
+ D.batches.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))||(b._ts||0)-(a._ts||0)).forEach(b=>rows.push(F.map(f=>csvCell(b[f[0]])).join(",")));
+ dl(`roast-data-${stamp()}.csv`,"﻿"+rows.join("\r\n"),"text/csv;charset=utf-8");say("已匯出 CSV")}
+function parseCsv(t){t=t.replace(/^﻿/,"");const rows=[];let r=[],c="",q=false;
+ for(let i=0;i<t.length;i++){const ch=t[i];
+  if(q){if(ch=='"'){if(t[i+1]=='"'){c+='"';i++}else q=false}else c+=ch}
+  else if(ch=='"')q=true;else if(ch==","){r.push(c);c=""}
+  else if(ch=="\n"||ch=="\r"){if(ch=="\r"&&t[i+1]=="\n")i++;r.push(c);c="";rows.push(r);r=[]}else c+=ch}
+ if(c!==""||r.length){r.push(c);rows.push(r)}
+ return rows.filter(r=>r.some(x=>x!==""))}
+function pickFile(kind){const el=$("imp");el.dataset.k=kind;el.accept=kind=="json"?".json,application/json":".csv,text/csv";el.value="";el.click()}
+async function onFile(el){const f=el.files[0];if(!f)return;const txt=await f.text();
+ try{
+  if(el.dataset.k=="json"){const j=JSON.parse(txt);if(!j||!Array.isArray(j.batches))throw 0;
+   if(!await ask("還原備份會取代目前所有資料,確定嗎?"))return;
+   for(const t in S)D[t]=Array.isArray(j[t])?j[t]:[];saveLocal();render();say("已還原備份")}
+  else{const rows=parseCsv(txt),F=S.batches.f,idx=(rows[0]||[]).map(h=>F.findIndex(f=>f[1]==h.trim()));
+   if(!idx.some(i=>i>=0))throw 0;let n=0;const ts=Date.now();
+   for(const r of rows.slice(1)){const d={};
+    idx.forEach((ci,j)=>{if(ci<0)return;const v=(r[j]||"").trim(),ty=F[ci][2];d[F[ci][0]]=v===""?null:ty=="n"?(isNaN(+v)?null:+v):v});
+    d._ts=ts-n;D.batches.push({id:nid(),...d});n++}
+   D.batches.sort((a,b)=>(b._ts||0)-(a._ts||0));saveLocal();render();say(`已匯入 ${n} 筆`)}
+ }catch(e){say("檔案格式不正確,無法匯入")}}
+loadLocal();render();
+</script></body></html>
